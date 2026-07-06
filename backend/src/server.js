@@ -1,4 +1,4 @@
-import cors from 'cors';
+﻿import cors from 'cors';
 import express from 'express';
 import mysql from 'mysql2/promise';
 
@@ -16,12 +16,15 @@ const pool = mysql.createPool({
   charset: 'utf8mb4'
 });
 
+const defaultCompany = 'Eves Enterprise';
+
 const seed = {
   assets: [
     {
-      id: 'IT-NTB-00042',
+      id: 'AST-COM-00042',
+      company: 'Eves Enterprise',
       name: 'Lenovo ThinkPad X1 Carbon Gen 11',
-      category: 'Notebook',
+      category: 'คอมพิวเตอร์และอุปกรณ์',
       serial: 'PF4Z9A21',
       assignedTo: 'กมลชนก ศรีวัฒน์',
       department: 'บัญชี',
@@ -36,9 +39,10 @@ const seed = {
       ]
     },
     {
-      id: 'IT-MON-00109',
+      id: 'AST-OFF-00109',
+      company: 'KIO',
       name: 'Dell UltraSharp U2723QE',
-      category: 'Monitor',
+      category: 'เครื่องใช้สำนักงาน',
       serial: 'CN0D7K92',
       assignedTo: 'วรุตม์ ภักดี',
       department: 'Product',
@@ -50,9 +54,10 @@ const seed = {
       repairs: [{ date: '2025-12-19', detail: 'เคลมสาย USB-C', cost: 0, technician: 'Dell Onsite' }]
     },
     {
-      id: 'IT-MOB-00031',
+      id: 'AST-COM-00031',
+      company: 'NEJ Science',
       name: 'iPhone 15 Pro',
-      category: 'Mobile',
+      category: 'คอมพิวเตอร์และอุปกรณ์',
       serial: 'F2L92THQ0',
       assignedTo: 'พรทิพย์ ใจดี',
       department: 'Sales',
@@ -64,13 +69,14 @@ const seed = {
       repairs: [{ date: '2026-05-18', detail: 'หน้าจอแตก รออะไหล่', cost: 9800, technician: 'Apple Authorized' }]
     },
     {
-      id: 'IT-NTB-00058',
-      name: 'MacBook Air M3 13"',
-      category: 'Notebook',
+      id: 'AST-FUR-00058',
+      company: 'Wellveness',
+      name: 'โต๊ะทำงานปรับระดับ',
+      category: 'คอมพิวเตอร์และอุปกรณ์',
       serial: 'C02YY771Q6L4',
       assignedTo: 'คลังกลาง',
-      department: 'IT',
-      location: 'คลัง IT ชั้น 4',
+      department: 'ส่วนกลาง',
+      location: 'คลังทรัพย์สินกลาง',
       status: 'อยู่ในสต็อก',
       purchaseDate: '2025-01-15',
       warrantyUntil: '2028-01-14',
@@ -79,16 +85,16 @@ const seed = {
     }
   ],
   employees: [
-    { id: 'EMP-1001', name: 'กมลชนก ศรีวัฒน์', department: 'บัญชี', position: 'Accounting Manager', email: 'kamonchanok@example.com', location: 'ชั้น 12 อาคาร A' },
-    { id: 'EMP-1002', name: 'วรุตม์ ภักดี', department: 'Product', position: 'Product Manager', email: 'warut@example.com', location: 'ชั้น 9 อาคาร B' },
-    { id: 'EMP-1003', name: 'พรทิพย์ ใจดี', department: 'Sales', position: 'Sales Executive', email: 'porntip@example.com', location: 'สาขาเชียงใหม่' },
-    { id: 'EMP-IT-STOCK', name: 'คลังกลาง', department: 'IT', position: 'IT Stock', email: 'it-stock@example.com', location: 'คลัง IT ชั้น 4' }
+    { id: 'EMP-1001', company: 'Eves Enterprise', name: 'กมลชนก ศรีวัฒน์', department: 'บัญชี', position: 'Accounting Manager', email: 'kamonchanok@example.com', location: 'ชั้น 12 อาคาร A' },
+    { id: 'EMP-1002', company: 'KIO', name: 'วรุตม์ ภักดี', department: 'Product', position: 'Product Manager', email: 'warut@example.com', location: 'ชั้น 9 อาคาร B' },
+    { id: 'EMP-1003', company: 'NEJ Science', name: 'พรทิพย์ ใจดี', department: 'Sales', position: 'Sales Executive', email: 'porntip@example.com', location: 'สาขาเชียงใหม่' },
+    { id: 'EMP-IT-STOCK', company: 'Wellveness', name: 'คลังกลาง', department: 'ส่วนกลาง', position: 'Asset Stock', email: 'asset-stock@example.com', location: 'คลังทรัพย์สินกลาง' }
   ],
   stock: [
-    { name: 'USB-C Hub 8-in-1', sku: 'ACC-HUB-08', available: 4, min: 8, location: 'คลัง IT ชั้น 4' },
-    { name: 'Logitech MX Master 3S', sku: 'ACC-MOU-3S', available: 13, min: 10, location: 'คลัง IT ชั้น 4' },
+    { name: 'USB-C Hub 8-in-1', sku: 'ACC-HUB-08', available: 4, min: 8, location: 'คลังทรัพย์สินกลาง' },
+    { name: 'Logitech MX Master 3S', sku: 'ACC-MOU-3S', available: 13, min: 10, location: 'คลังทรัพย์สินกลาง' },
     { name: 'RAM DDR5 16GB', sku: 'SP-RAM-D5-16', available: 3, min: 6, location: 'ห้องซ่อม' },
-    { name: 'สาย HDMI 2m', sku: 'CB-HDMI-02', available: 28, min: 12, location: 'คลัง IT ชั้น 4' }
+    { name: 'สาย HDMI 2m', sku: 'CB-HDMI-02', available: 28, min: 12, location: 'คลังทรัพย์สินกลาง' }
   ]
 };
 
@@ -99,6 +105,7 @@ function requireFields(body, fields) {
 function toAsset(row, repairs = [], returns = []) {
   return {
     id: row.id,
+    company: row.company || defaultCompany,
     name: row.name,
     category: row.category,
     serial: row.serial,
@@ -117,6 +124,7 @@ function toAsset(row, repairs = [], returns = []) {
 function toEmployee(row) {
   return {
     id: row.id,
+    company: row.company || defaultCompany,
     name: row.name,
     department: row.department,
     position: row.position,
@@ -148,10 +156,19 @@ async function connectWithRetry(retries = 45) {
   }
 }
 
+async function addColumnIfMissing(tableName, columnName, definition) {
+  try {
+    await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+  } catch (error) {
+    if (error.code !== 'ER_DUP_FIELDNAME') throw error;
+  }
+}
+
 async function migrate() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS employees (
       id VARCHAR(64) PRIMARY KEY,
+      company VARCHAR(120) NOT NULL DEFAULT 'Eves Enterprise',
       name VARCHAR(255) NOT NULL,
       department VARCHAR(255) NOT NULL,
       position VARCHAR(255) NOT NULL DEFAULT '-',
@@ -164,6 +181,7 @@ async function migrate() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS assets (
       id VARCHAR(64) PRIMARY KEY,
+      company VARCHAR(120) NOT NULL DEFAULT 'Eves Enterprise',
       name VARCHAR(255) NOT NULL,
       category VARCHAR(120) NOT NULL,
       serial VARCHAR(160) NOT NULL,
@@ -216,6 +234,9 @@ async function migrate() {
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
   `);
+
+  await addColumnIfMissing('employees', 'company', "VARCHAR(120) NOT NULL DEFAULT 'Eves Enterprise'");
+  await addColumnIfMissing('assets', 'company', "VARCHAR(120) NOT NULL DEFAULT 'Eves Enterprise'");
 }
 
 async function seedDatabase() {
@@ -228,18 +249,19 @@ async function seedDatabase() {
 
     for (const employee of seed.employees) {
       await connection.query(
-        `INSERT IGNORE INTO employees (id, name, department, position, email, location)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [employee.id, employee.name, employee.department, employee.position, employee.email, employee.location]
+        `INSERT IGNORE INTO employees (id, company, name, department, position, email, location)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [employee.id, employee.company, employee.name, employee.department, employee.position, employee.email, employee.location]
       );
     }
 
     for (const asset of seed.assets) {
       await connection.query(
-        `INSERT IGNORE INTO assets (id, name, category, serial, assigned_to, department, location, status, purchase_date, warranty_until, \`condition\`)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT IGNORE INTO assets (id, company, name, category, serial, assigned_to, department, location, status, purchase_date, warranty_until, \`condition\`)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           asset.id,
+          asset.company,
           asset.name,
           asset.category,
           asset.serial,
@@ -355,11 +377,12 @@ app.get('/api/assets', async (_req, res, next) => {
 
 app.post('/api/assets', async (req, res, next) => {
   try {
-    const missing = requireFields(req.body, ['id', 'name', 'serial', 'assignedTo', 'department', 'location', 'status']);
+    const missing = requireFields(req.body, ['id', 'company', 'name', 'serial', 'assignedTo', 'department', 'location', 'status']);
     if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
     const asset = {
       id: String(req.body.id).trim(),
+      company: String(req.body.company || defaultCompany).trim(),
       name: String(req.body.name).trim(),
       category: String(req.body.category || 'Other').trim(),
       serial: String(req.body.serial).trim(),
@@ -373,10 +396,11 @@ app.post('/api/assets', async (req, res, next) => {
     };
 
     await pool.query(
-      `INSERT INTO assets (id, name, category, serial, assigned_to, department, location, status, purchase_date, warranty_until, \`condition\`)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO assets (id, company, name, category, serial, assigned_to, department, location, status, purchase_date, warranty_until, \`condition\`)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         asset.id,
+        asset.company,
         asset.name,
         asset.category,
         asset.serial,
@@ -402,10 +426,11 @@ app.post('/api/assets', async (req, res, next) => {
 
 app.put('/api/assets/:id', async (req, res, next) => {
   try {
-    const missing = requireFields(req.body, ['name', 'serial', 'assignedTo', 'department', 'location', 'status']);
+    const missing = requireFields(req.body, ['company', 'name', 'serial', 'assignedTo', 'department', 'location', 'status']);
     if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
     const asset = {
+      company: String(req.body.company || defaultCompany).trim(),
       name: String(req.body.name).trim(),
       category: String(req.body.category || 'Other').trim(),
       serial: String(req.body.serial).trim(),
@@ -420,9 +445,10 @@ app.put('/api/assets/:id', async (req, res, next) => {
 
     const [result] = await pool.query(
       `UPDATE assets
-       SET name = ?, category = ?, serial = ?, assigned_to = ?, department = ?, location = ?, status = ?, purchase_date = ?, warranty_until = ?, \`condition\` = ?
+       SET company = ?, name = ?, category = ?, serial = ?, assigned_to = ?, department = ?, location = ?, status = ?, purchase_date = ?, warranty_until = ?, \`condition\` = ?
        WHERE id = ?`,
       [
+        asset.company,
         asset.name,
         asset.category,
         asset.serial,
@@ -541,7 +567,7 @@ app.post('/api/assets/:id/returns', async (req, res, next) => {
         `UPDATE assets
          SET assigned_to = ?, department = ?, location = ?, status = ?, \`condition\` = ?
          WHERE id = ?`,
-        ['คลังกลาง', 'IT', returnRecord.location, 'อยู่ในสต็อก', returnRecord.condition, req.params.id]
+        ['คลังกลาง', 'ส่วนกลาง', returnRecord.location, 'อยู่ในสต็อก', returnRecord.condition, req.params.id]
       );
 
       await connection.commit();
@@ -569,11 +595,12 @@ app.get('/api/employees', async (_req, res, next) => {
 
 app.post('/api/employees', async (req, res, next) => {
   try {
-    const missing = requireFields(req.body, ['id', 'name', 'department']);
+    const missing = requireFields(req.body, ['id', 'company', 'name', 'department']);
     if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
     const employee = {
       id: String(req.body.id).trim(),
+      company: String(req.body.company || defaultCompany).trim(),
       name: String(req.body.name).trim(),
       department: String(req.body.department).trim(),
       position: String(req.body.position || '-').trim(),
@@ -582,9 +609,9 @@ app.post('/api/employees', async (req, res, next) => {
     };
 
     await pool.query(
-      `INSERT INTO employees (id, name, department, position, email, location)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [employee.id, employee.name, employee.department, employee.position, employee.email, employee.location]
+      `INSERT INTO employees (id, company, name, department, position, email, location)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [employee.id, employee.company, employee.name, employee.department, employee.position, employee.email, employee.location]
     );
 
     res.status(201).json(employee);
@@ -596,11 +623,12 @@ app.post('/api/employees', async (req, res, next) => {
 
 app.put('/api/employees/:id', async (req, res, next) => {
   try {
-    const missing = requireFields(req.body, ['name', 'department']);
+    const missing = requireFields(req.body, ['company', 'name', 'department']);
     if (missing.length) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
     const employee = {
       id: req.params.id,
+      company: String(req.body.company || defaultCompany).trim(),
       name: String(req.body.name).trim(),
       department: String(req.body.department).trim(),
       position: String(req.body.position || '-').trim(),
@@ -610,9 +638,9 @@ app.put('/api/employees/:id', async (req, res, next) => {
 
     const [result] = await pool.query(
       `UPDATE employees
-       SET name = ?, department = ?, position = ?, email = ?, location = ?
+       SET company = ?, name = ?, department = ?, position = ?, email = ?, location = ?
        WHERE id = ?`,
-      [employee.name, employee.department, employee.position, employee.email, employee.location, employee.id]
+      [employee.company, employee.name, employee.department, employee.position, employee.email, employee.location, employee.id]
     );
 
     if (!result.affectedRows) return res.status(404).json({ error: 'Employee not found' });
@@ -717,7 +745,7 @@ async function start() {
   await migrate();
   await seedDatabase();
   app.listen(port, '0.0.0.0', () => {
-    console.log(`IT Asset backend listening on port ${port}`);
+    console.log(`Company Asset backend listening on port ${port}`);
   });
 }
 
