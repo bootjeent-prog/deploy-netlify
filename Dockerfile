@@ -1,8 +1,10 @@
-FROM node:22-alpine AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY scripts ./scripts
+COPY src ./src
+COPY index.html tsconfig.json vite.config.ts ./
 RUN npm run build
 
 FROM nginx:1.27-alpine

@@ -2,19 +2,20 @@ services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: it_asset_db
-      MYSQL_USER: it_asset_user
-      MYSQL_PASSWORD: it_asset_password
-      MYSQL_ROOT_PASSWORD: it_asset_root_password
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-it_asset_db}
+      MYSQL_USER: ${MYSQL_USER:-it_asset_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-it_asset_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-it_asset_root_password}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - it_asset_mysql:/var/lib/mysql
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
+    restart: unless-stopped
 
   backend:
     build:
@@ -22,22 +23,33 @@ services:
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: it_asset_db
-      DB_USER: it_asset_user
-      DB_PASSWORD: it_asset_password
+      DB_NAME: ${MYSQL_DATABASE:-it_asset_db}
+      DB_USER: ${MYSQL_USER:-it_asset_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-it_asset_password}
+      DEFAULT_LOGIN_PASSWORD: ${DEFAULT_LOGIN_PASSWORD:-admin123}
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-12}
+      INITIAL_COMPANY_CODE: ${INITIAL_COMPANY_CODE:-COMPANY}
+      INITIAL_COMPANY_NAME: ${INITIAL_COMPANY_NAME:-Company}
     ports:
-      - "4100:4000"
+      - "127.0.0.1:4100:4000"
     depends_on:
       mysql:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
 
   frontend:
-    build:
-      context: .
+    build: .
     ports:
       - "8081:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   it_asset_mysql:
